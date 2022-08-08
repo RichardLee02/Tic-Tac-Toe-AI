@@ -64,22 +64,50 @@ public class Game {
 
     // EFFECTS: runs player vs. bot game
     public void runSinglePlayer() {
-        while (true) {
-            gameTemplate("SINGLE");
-            if (config.hasXWon()) {
-                displayEnding("WIN");
-                break;
-            } else if (config.isGridComplete()) {
-                displayEnding("TIE");
-                break;
-            }
+        System.out.println("Select From:" + "\n");
+        System.out.println("\t1 - Go First");
+        System.out.println("\t2 - Go Second" + "\n");
+        System.out.print("Enter A Number (1 or 2):" + "\n");
+        command = input.nextInt();
+        if (command == 1) {
+            while (true) {
+                gameTemplate("SINGLE");
+                if (config.hasXWon()) {
+                    displayEnding("WIN");
+                    break;
+                } else if (config.isGridComplete()) {
+                    displayEnding("TIE");
+                    break;
+                }
 
-            config.botMove();
-            System.out.println("\n" + "Bot Move: ");
-            config.getGrid();
-            if (config.hasOWon()) {
-                displayEnding("BOT");
-                break;
+                config.botMove("SECOND");
+                System.out.println("\n" + "+----------------- Tic-Tac-Toe -----------------+");
+                System.out.println("\n" + "Bot Move: ");
+                config.getGrid();
+                if (config.hasOWon()) {
+                    displayEnding("BOT");
+                    break;
+                }
+            }
+        } else if (command == 2) {
+            while (true) {
+                System.out.println("\n" + "+----------------- Tic-Tac-Toe -----------------+");
+                config.botMove("FIRST");
+                System.out.println("\n" + "Bot Move: ");
+                config.getGrid();
+                if (config.hasXWon()) {
+                    displayEnding("BOT");
+                    break;
+                } else if (config.isGridComplete()) {
+                    displayEnding("TIE");
+                    break;
+                }
+
+                gameTemplate("SINGLE: SECOND");
+                if (config.hasOWon()) {
+                    displayEnding("WIN");
+                    break;
+                }
             }
         }
     }
@@ -108,13 +136,13 @@ public class Game {
     // EFFECTS: processes user inputs, and updates the grid
     public void gameTemplate(String str) {
         System.out.println("\n" + "+----------------- Tic-Tac-Toe -----------------+");
-        System.out.println("\n" + "Current Board: ");
+        System.out.println("\n" + "Current Board:");
         config.getGrid();
 
-        if (str.equals("SINGLE")) {
-            System.out.println("\n" + "Enter A Number (1-9): ");
+        if (str.equals("SINGLE") || str.equals("SINGLE: SECOND")) {
+            System.out.println("\n" + "Enter A Number (1-9):");
         } else {
-            System.out.println("\n" + "[PLAYER " + str + "] Enter A Number (1-9): ");
+            System.out.println("\n" + "[PLAYER " + str + "] Enter A Number (1-9):");
         }
 
         command = input.nextInt();
@@ -125,12 +153,12 @@ public class Game {
             } else {
                 System.out.println("\n" + "Coordinate [" + command + "] Has Already Been Marked! Try Again!");
             }
-            System.out.println("\n" + "Current Board: ");
+            System.out.println("\n" + "Current Board:");
             config.getGrid();
-            if (str.equals("SINGLE")) {
-                System.out.println("\n" + "Enter A Number (1-9): ");
+            if (str.equals("SINGLE") || str.equals("SINGLE: SECOND")) {
+                System.out.println("\n" + "Enter A Number (1-9):");
             } else {
-                System.out.println("\n" + "[PLAYER " + str + "] Enter A Number (1-9): ");
+                System.out.println("\n" + "[PLAYER " + str + "] Enter A Number (1-9):");
             }
             command = input.nextInt();
         }
@@ -141,10 +169,10 @@ public class Game {
             config.updateGridO(command);
         }
 
-        if (str.equals("SINGLE")) {
-            System.out.println("\n" + "Your Move: ");
+        if (str.equals("SINGLE") || str.equals("SINGLE: SECOND")) {
+            System.out.println("\n" + "Your Move:");
         } else {
-            System.out.println("\n" + "Player [" + str + "] Move: ");
+            System.out.println("\n" + "Player [" + str + "] Move:");
         }
 
         config.getGrid();

@@ -94,7 +94,7 @@ public class Configuration {
     }
 
     // EFFECTS: generates a random number from 1-9 and updates the grid
-    public void botMove() {
+    public void botMove(String str) {
         int min = 1;
         int max = 9;
         Random rand = new Random();
@@ -102,7 +102,11 @@ public class Configuration {
         while (!isCoordinateAvailable(randomNum)) {
             randomNum = rand.nextInt(max - min + 1) + min;
         }
-        updateGridO(randomNum);
+        if (str.equals("FIRST")) {
+            updateGridX(randomNum);
+        } else {
+            updateGridO(randomNum);
+        }
     }
 
     // EFFECTS: returns true if the X markings form a line, otherwise false
