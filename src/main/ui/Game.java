@@ -62,9 +62,10 @@ public class Game {
         }
     }
 
+    // MODIFIES: this
     // EFFECTS: runs player vs. bot game
     public void runSinglePlayer() {
-        System.out.println("Select From:" + "\n");
+        System.out.println("\nSelect From:" + "\n");
         System.out.println("\t1 - Go First");
         System.out.println("\t2 - Go Second" + "\n");
         System.out.print("Enter A Number (1 or 2):" + "\n");
@@ -74,9 +75,11 @@ public class Game {
                 gameTemplate("SINGLE");
                 if (config.hasXWon()) {
                     displayEnding("WIN");
+                    playAgain("SINGLE");
                     break;
                 } else if (config.isGridComplete()) {
                     displayEnding("TIE");
+                    playAgain("SINGLE");
                     break;
                 }
 
@@ -86,6 +89,7 @@ public class Game {
                 config.getGrid();
                 if (config.hasOWon()) {
                     displayEnding("BOT");
+                    playAgain("SINGLE");
                     break;
                 }
             }
@@ -97,36 +101,43 @@ public class Game {
                 config.getGrid();
                 if (config.hasXWon()) {
                     displayEnding("BOT");
+                    playAgain("SINGLE");
                     break;
                 } else if (config.isGridComplete()) {
                     displayEnding("TIE");
+                    playAgain("SINGLE");
                     break;
                 }
 
                 gameTemplate("SINGLE: SECOND");
                 if (config.hasOWon()) {
                     displayEnding("WIN");
+                    playAgain("SINGLE");
                     break;
                 }
             }
         }
     }
 
+    // MODIFIES: this
     // EFFECTS: runs player vs. player game
     public void runMultiPlayer() {
         while (true) {
             gameTemplate("X");
             if (config.hasXWon()) {
                 displayEnding("X");
+                playAgain("MULTIPLE");
                 break;
             } else if (config.isGridComplete()) {
                 displayEnding("TIE");
+                playAgain("MULTIPLE");
                 break;
             }
 
             gameTemplate("O");
             if (config.hasOWon()) {
                 displayEnding("O");
+                playAgain("MULTIPLE");
                 break;
             }
         }
@@ -196,10 +207,29 @@ public class Game {
                 break;
         }
         System.out.println("=================================================");
-        System.out.println("\n" + "=================================================");
-        System.out.println("=                                               =");
-        System.out.println("=                  GAME OVER!                   =");
-        System.out.println("=                                               =");
-        System.out.println("=================================================");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: given an input, either resets the game or ends the game
+    public void playAgain(String str) {
+        System.out.println("\nPlay Again?" + "\n");
+        System.out.println("\t1 -> Reset Game");
+        System.out.println("\t2 -> Quit");
+        System.out.println("\n" + "Enter A Number (1 or 2):");
+        command = input.nextInt();
+        if (command == 1) {
+            config = new Configuration();
+            if (str.equals("SINGLE")) {
+                runSinglePlayer();
+            } else if (str.equals("MULTIPLE")) {
+                runMultiPlayer();
+            }
+        } else if (command == 2) {
+            System.out.println("\n" + "=================================================");
+            System.out.println("=                                               =");
+            System.out.println("=                  GAME OVER!                   =");
+            System.out.println("=                                               =");
+            System.out.println("=================================================");
+        }
     }
 }
