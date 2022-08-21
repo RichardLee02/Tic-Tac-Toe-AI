@@ -6,8 +6,7 @@
 3 by 3 grid, with the objective of the markings creating a line (either diagonal, horizontal, or vertical). 
 
 **Additions To Add:**  
-
-- Minimax Algorithm 
+- AI Bot Using Minimax Algorithm 
 
 
     
