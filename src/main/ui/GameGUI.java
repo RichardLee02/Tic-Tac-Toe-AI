@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 public class GameGUI {
 
@@ -15,7 +16,7 @@ public class GameGUI {
     private String currentTurn;
 
     private JFrame openingFrame;
-//    private JFrame singlePlayerFrame;
+    private JFrame singlePlayerFrame;
     private JFrame multiPlayerFrame;
 
     private JLabel openingLabel;
@@ -30,7 +31,7 @@ public class GameGUI {
     private JLabel menuLabel;
     private JLabel byLabel;
 
-//    private JButton singlePlayerButton;
+    private JButton singlePlayerButton;
     private JButton multiPlayerButton;
     private JButton quitButton;
     private JButton newGameButton;
@@ -38,14 +39,13 @@ public class GameGUI {
     private JButton exitButton;
     private JButton[][] gameButton;
 
-//    private JPanel singlePlayerPanel;
-    private JPanel multiPlayerPanel;
+    private JPanel gamePanel;
     private JPanel menuPanel;
     private JPanel scoreBoardPanel;
 
     public GameGUI() {
         openingFrame = new JFrame("Tic-Tac-Toe");
-//        singlePlayerFrame = new JFrame("Tic-Tac-Toe");
+        singlePlayerFrame = new JFrame("Tic-Tac-Toe");
         multiPlayerFrame = new JFrame("Tic-Tac-Toe");
         gameButton = new JButton[3][3];
         playerOneScore = 0;
@@ -57,7 +57,7 @@ public class GameGUI {
     // EFFECTS: runs the Tic-Tac-Toe game
     public void runGame() {
         initializeOpeningLabel();
-//        initializeSinglePlayerButton();
+        initializeSinglePlayerButton();
         initializeMultiPlayerButton();
         initializeQuitButton();
         initializeOpeningFrame();
@@ -80,52 +80,151 @@ public class GameGUI {
         openingFrame.add(openingLabel);
 
         byLabel = new JLabel("By: Richard Lee");
-        byLabel.setBounds(330, 170, 500, 200);
-        byLabel.setFont(new Font("Serif", Font.BOLD, 30));
+        byLabel.setBounds(340, 150, 500, 200);
+        byLabel.setFont(new Font("Serif", Font.BOLD,28));
         openingFrame.add(byLabel);
     }
 
-//    // EFFECTS: initializes the single-player button
-//    public void initializeSinglePlayerButton() {
-//        singlePlayerButton = new JButton("Player Vs. Bot");
-//        singlePlayerButton.setBounds(350, 300, 200, 40);
-//        openingFrame.add(singlePlayerButton);
-//        singlePlayerButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                openingFrame.dispose();
-//                singlePlayerFrame = new JFrame("Tic-Tac-Toe");
-//                initializeSinglePlayerFrame();
-//            }
-//        });
-//    }
+    // EFFECTS: initializes the single-player button
+    public void initializeSinglePlayerButton() {
+        singlePlayerButton = new JButton("Single-Player");
+        singlePlayerButton.setBounds(350, 300, 200, 40);
+        openingFrame.add(singlePlayerButton);
+        singlePlayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openingFrame.dispose();
+                initializeCurrentTurnLabel("SINGLE");
+                initializeMultiPlayerPanel("SINGLE");
+                for (int x = 0; x < 3; x++) {
+                    for (int y = 0; y < 3; y++) {
+                        int coord_X = x;
+                        int coord_Y = y;
+                        gameButton[x][y] = new JButton(" ");
+                        gamePanel.add(gameButton[x][y]);
+                        gameButton[x][y].addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                if (gameButton[coord_X][coord_Y].getText().equals(" ")) {
+                                    gameButton[coord_X][coord_Y].setText("X");
+                                    currentTurn = "O";
+                                    currentTurnLabel.setText("Current Turn: " + currentTurn);
+                                    botMove();
+                                }
+                                checkWinner();
+                            }
+                        });
+                    }
+                }
 
-//    // EFFECTS: initializes the single-player frame
-//    public void initializeSinglePlayerFrame() {
-//        singlePlayerFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-//        singlePlayerFrame.setLayout(null);
-//        singlePlayerFrame.setLocationRelativeTo(null);
-//        singlePlayerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        singlePlayerFrame.setVisible(true);
-//    }
+                initializeMenuPanel("SINGLE");
+                initializeScoreBoardPanel("SINGLE");
+                initializeScoreBoardLabel();
+                initializePlayerOneLabel("SINGLE");
+                initializePlayerTwoLabel("SINGLE");
+                initializeXLabel();
+                initializeOLabel();
+                initializePlayerOneScoreLabel();
+                initializePlayerTwoScoreLabel();
+                initializeMenuLabel();
+                initializeByLabel("SINGLE");
+                initializeNewGameButton();
+                initializeResetScoreButton();
+                initializeExitButton("SINGLE");
+                initializeSinglePlayerFrame();
+            }
+        });
+    }
+
+    // EFFECTS: returns true if the coordinate is available
+    public boolean isAvailable(int num) {
+        if (num == 1) {
+            return gameButton[0][0].getText().equals(" ");
+        } else if (num == 2) {
+            return gameButton[0][1].getText().equals(" ");
+        } else if (num == 3) {
+            return gameButton[0][2].getText().equals(" ");
+        } else if (num == 4) {
+            return gameButton[1][0].getText().equals(" ");
+        } else if (num == 5) {
+            return gameButton[1][1].getText().equals(" ");
+        } else if (num == 6) {
+            return gameButton[1][2].getText().equals(" ");
+        } else if (num == 7) {
+            return gameButton[2][0].getText().equals(" ");
+        } else if (num == 8) {
+            return gameButton[2][1].getText().equals(" ");
+        } else {
+            return gameButton[2][2].getText().equals(" ");
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: given a num, updates the board
+    public void updateBoard(int num) {
+        if (num == 1) {
+            gameButton[0][0].setText("O");
+        } else if (num == 2) {
+            gameButton[0][1].setText("O");
+        } else if (num == 3) {
+            gameButton[0][2].setText("O");
+        } else if (num == 4) {
+            gameButton[1][0].setText("O");
+        } else if (num == 5) {
+            gameButton[1][1].setText("O");
+        } else if (num == 6) {
+            gameButton[1][2].setText("O");
+        } else if (num == 7) {
+            gameButton[2][0].setText("O");
+        } else if (num == 8) {
+            gameButton[2][1].setText("O");
+        } else if (num == 9) {
+            gameButton[2][2].setText("O");
+        }
+    }
+
+    // EFFECTS: generates a number, and updates the board
+    public void botMove() {
+        if (!isGameOver()) {
+            int min = 1;
+            int max = 9;
+            Random rand = new Random();
+            int randomNum = rand.nextInt(max - min + 1) + min;
+            while (!isAvailable(randomNum)) {
+                randomNum = rand.nextInt(max - min + 1) + min;
+            }
+            updateBoard(randomNum);
+            currentTurn = "X";
+            currentTurnLabel.setText("Current Turn: " + currentTurn);
+        }
+    }
+
+    // EFFECTS: initializes the single-player frame
+    public void initializeSinglePlayerFrame() {
+        singlePlayerFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        singlePlayerFrame.setLayout(null);
+        singlePlayerFrame.setLocationRelativeTo(null);
+        singlePlayerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        singlePlayerFrame.setVisible(true);
+    }
 
     // EFFECTS: initializes the multi-player button
     public void initializeMultiPlayerButton() {
-        multiPlayerButton = new JButton("Play");
+        multiPlayerButton = new JButton("Multi-Player");
         multiPlayerButton.setBounds(350, 350, 200, 40);
         openingFrame.add(multiPlayerButton);
         multiPlayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openingFrame.dispose();
-                initializeCurrentTurnLabel();
-                initializeMultiPlayerPanel();
+                initializeCurrentTurnLabel("MULTI");
+                initializeMultiPlayerPanel("MULTI");
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         int coord_X = x;
                         int coord_Y = y;
                         gameButton[x][y] = new JButton(" ");
-                        multiPlayerPanel.add(gameButton[x][y]);
+                        gamePanel.add(gameButton[x][y]);
                         gameButton[x][y].addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -136,40 +235,48 @@ public class GameGUI {
                     }
                 }
 
-                initializeMenuPanel();
-                initializeScoreBoardPanel();
+                initializeMenuPanel("MULTI");
+                initializeScoreBoardPanel("MULTI");
                 initializeScoreBoardLabel();
-                initializePlayerOneLabel();
-                initializePlayerTwoLabel();
+                initializePlayerOneLabel("MULTI");
+                initializePlayerTwoLabel("MULTI");
                 initializeXLabel();
                 initializeOLabel();
                 initializePlayerOneScoreLabel();
                 initializePlayerTwoScoreLabel();
                 initializeMenuLabel();
-                initializeByLabel();
+                initializeByLabel("MULTI");
                 initializeNewGameButton();
                 initializeResetScoreButton();
-                initializeExitButton();
+                initializeExitButton("MULTI");
                 initializeMultiPlayerFrame();
             }
         });
     }
 
     // EFFECTS: initializes the current turn label
-    public void initializeCurrentTurnLabel() {
+    public void initializeCurrentTurnLabel(String str) {
         currentTurnLabel = new JLabel("Current Turn: " + currentTurn);
         currentTurnLabel.setBounds(275, 50, 300, 100);
         currentTurnLabel.setFont(new Font("Serif", Font.BOLD, 18));
-        multiPlayerFrame.add(currentTurnLabel);
+        if (str.equals("SINGLE")) {
+            singlePlayerFrame.add(currentTurnLabel);
+        } else {
+            multiPlayerFrame.add(currentTurnLabel);
+        }
     }
 
     // EFFECTS: initializes the multi-player panel
-    public void initializeMultiPlayerPanel() {
-        multiPlayerPanel = new JPanel();
-        multiPlayerPanel.setBounds(275, 125, 350, 350);
-        multiPlayerPanel.setLayout(new GridLayout(3, 3));
-        multiPlayerPanel.setBackground(Color.LIGHT_GRAY);
-        multiPlayerFrame.add(multiPlayerPanel);
+    public void initializeMultiPlayerPanel(String str) {
+        gamePanel = new JPanel();
+        gamePanel.setBounds(275, 125, 350, 350);
+        gamePanel.setLayout(new GridLayout(3, 3));
+        gamePanel.setBackground(Color.LIGHT_GRAY);
+        if (str.equals("SINGLE")) {
+            singlePlayerFrame.add(gamePanel);
+        } else {
+            multiPlayerFrame.add(gamePanel);
+        }
     }
 
     // MODIFIES: this
@@ -356,21 +463,29 @@ public class GameGUI {
     }
 
     // EFFECTS: initializes the menu panel
-    public void initializeMenuPanel() {
+    public void initializeMenuPanel(String str) {
         menuPanel = new JPanel();
         menuPanel.setBounds(25, 125, 225, 350);
         menuPanel.setLayout(null);
         menuPanel.setBackground(Color.LIGHT_GRAY);
-        multiPlayerFrame.add(menuPanel);
+        if (str.equals("SINGLE")) {
+            singlePlayerFrame.add(menuPanel);
+        } else {
+            multiPlayerFrame.add(menuPanel);
+        }
     }
 
     // EFFECTS: initializes the scoreboard panel
-    public void initializeScoreBoardPanel() {
+    public void initializeScoreBoardPanel(String str) {
         scoreBoardPanel = new JPanel();
         scoreBoardPanel.setBounds(650, 125, 225, 350);
         scoreBoardPanel.setLayout(null);
         scoreBoardPanel.setBackground(Color.LIGHT_GRAY);
-        multiPlayerFrame.add(scoreBoardPanel);
+        if (str.equals("SINGLE")) {
+            singlePlayerFrame.add(scoreBoardPanel);
+        } else {
+            multiPlayerFrame.add(scoreBoardPanel);
+        }
     }
 
     // EFFECTS: initializes the scoreboard label
@@ -382,17 +497,27 @@ public class GameGUI {
     }
 
     // EFFECTS: initializes the player one label
-    public void initializePlayerOneLabel() {
-        playerOneLabel = new JLabel("Player 1: X");
-        playerOneLabel.setBounds(65, 95, 150, 50);
+    public void initializePlayerOneLabel(String str) {
+        if (str.equals("SINGLE")) {
+            playerOneLabel = new JLabel("You: X");
+            playerOneLabel.setBounds(85, 95, 150, 50);
+        } else {
+            playerOneLabel = new JLabel("Player 1: X");
+            playerOneLabel.setBounds(65, 95, 150, 50);
+        }
         playerOneLabel.setFont(new Font("Serif", Font.BOLD, 16));
         scoreBoardPanel.add(playerOneLabel);
     }
 
     // EFFECTS: initializes the player two label
-    public void initializePlayerTwoLabel() {
-        playerTwoLabel = new JLabel("Player 2: O");
-        playerTwoLabel.setBounds(65, 135, 150, 50);
+    public void initializePlayerTwoLabel(String str) {
+        if (str.equals("SINGLE")) {
+            playerTwoLabel = new JLabel("Bot:  O");
+            playerTwoLabel.setBounds(85, 135, 150, 50);
+        } else {
+            playerTwoLabel = new JLabel("Player 2: O");
+            playerTwoLabel.setBounds(65, 135, 150, 50);
+        }
         playerTwoLabel.setFont(new Font("Serif", Font.BOLD, 16));
         scoreBoardPanel.add(playerTwoLabel);
     }
@@ -442,9 +567,13 @@ public class GameGUI {
     }
 
     // EFFECTS: initializes the by whom label
-    public void initializeByLabel() {
-        byLabel = new JLabel("By: Richard Lee");
-        byLabel.setBounds(65, 60, 200, 50);
+    public void initializeByLabel(String str) {
+        if (str.equals("SINGLE")) {
+            byLabel = new JLabel("Single-Player");
+        } else {
+            byLabel = new JLabel("Multi-Player");
+        }
+        byLabel.setBounds(70, 60, 200, 50);
         byLabel.setFont(new Font("Serif", Font.BOLD, 12));
         menuPanel.add(byLabel);
     }
@@ -520,14 +649,18 @@ public class GameGUI {
     }
 
     // EFFECTS: initializes exit button
-    public void initializeExitButton() {
+    public void initializeExitButton(String str) {
         exitButton = new JButton("Exit");
         exitButton.setBounds(42, 265, 141, 40);
         menuPanel.add(exitButton);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                multiPlayerFrame.dispose();
+                if (str.equals("SINGLE")) {
+                    singlePlayerFrame.dispose();
+                } else {
+                    multiPlayerFrame.dispose();
+                }
             }
         });
     }
