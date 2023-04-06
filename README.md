@@ -9,7 +9,7 @@ Includes both a terminal version, and a GUI version made using Swing.
 
 **Additions To Add:**
 
-- More advanced AI bot using minimax algorithm and alpha-beta pruning
+- More advanced AI bot and alpha-beta pruning
 
 
     
