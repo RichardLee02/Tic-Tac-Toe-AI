@@ -4,12 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
 
 public class GameGUI {
 
     private static final int FRAME_WIDTH = 900;
     private static final int FRAME_HEIGHT = 600;
+    private static final String maximizingPlayer = "X";
+    private static final String minimizingPlayer = "O";
     private int playerOneScore;
     private int playerTwoScore;
 
@@ -183,20 +184,107 @@ public class GameGUI {
         }
     }
 
-    // EFFECTS: generates a number, and updates the board
+    // EFFECTS: updates the grid based on the best move available
     public void botMove() {
         if (!isGameOver()) {
-            int min = 1;
-            int max = 9;
-            Random rand = new Random();
-            int randomNum = rand.nextInt(max - min + 1) + min;
-            while (!isAvailable(randomNum)) {
-                randomNum = rand.nextInt(max - min + 1) + min;
+            int bestScore = Integer.MAX_VALUE;
+            int[] bestMove = new int[2];
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (gameButton[i][j].getText().equals(" ")) {
+                        gameButton[i][j].setText(minimizingPlayer);
+                        int val = minimax(gameButton, 0, true);
+                        gameButton[i][j].setText(" ");
+                        if (val < bestScore) {
+                            bestScore = val;
+                            bestMove[0] = i;
+                            bestMove[1] = j;
+                        }
+                    }
+                }
             }
-            updateBoard(randomNum);
-            currentTurn = "X";
-            currentTurnLabel.setText("Current Turn: " + currentTurn);
+            gameButton[bestMove[0]][bestMove[1]].setText(minimizingPlayer);
         }
+    }
+
+    // EFFECTS: returns the best value for that move
+    public int minimax(JButton[][] position, int depth, boolean isMaximizingPlayer) {
+        if (hasXWon()) {
+            return 1;
+        } else if (hasOWon()) {
+            return -1;
+        } else if (isGridComplete()) {
+            return 0;
+        }
+        if (isMaximizingPlayer) {
+            int maxVal = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (position[i][j].getText().equals(" ")) {
+                        position[i][j].setText(maximizingPlayer);
+                        int val = minimax(position, depth + 1, false);
+                        maxVal = Math.max(maxVal, val);
+                        position[i][j].setText(" ");
+                    }
+                }
+            }
+            return maxVal;
+        } else {
+            int minVal = Integer.MAX_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (position[i][j].getText().equals(" ")) {
+                        position[i][j].setText(minimizingPlayer);
+                        int val = minimax(position, depth + 1, true);
+                        minVal = Math.min(minVal, val);
+                        position[i][j].setText(" ");
+                    }
+                }
+            }
+            return minVal;
+        }
+    }
+
+    // EFFECTS: returns true if the X markings form a line, otherwise false
+    public boolean hasXWon() {
+        // vertical line
+        return gameButton[0][0].getText().equals("X") && gameButton[0][1].getText().equals("X") && gameButton[0][2].getText().equals("X") ||
+                gameButton[1][0].getText().equals("X") && gameButton[1][1].getText().equals("X") && gameButton[1][2].getText().equals("X") ||
+                gameButton[2][0].getText().equals("X") && gameButton[2][1].getText().equals("X") && gameButton[2][2].getText().equals("X") ||
+                // horizontal line
+                gameButton[0][0].getText().equals("X") && gameButton[1][0].getText().equals("X") && gameButton[2][0].getText().equals("X") ||
+                gameButton[0][1].getText().equals("X") && gameButton[1][1].getText().equals("X") && gameButton[2][1].getText().equals("X") ||
+                gameButton[0][2].getText().equals("X") && gameButton[1][2].getText().equals("X") && gameButton[2][2].getText().equals("X") ||
+                // diagonal line
+                gameButton[0][0].getText().equals("X") && gameButton[1][1].getText().equals("X") && gameButton[2][2].getText().equals("X") ||
+                gameButton[0][2].getText().equals("X") && gameButton[1][1].getText().equals("X") && gameButton[2][0].getText().equals("X");
+    }
+
+    // EFFECTS: returns true if the O markings form a line, otherwise false
+    public boolean hasOWon() {
+        // vertical line
+        return gameButton[0][0].getText().equals("O") && gameButton[0][1].getText().equals("O") && gameButton[0][2].getText().equals("O") ||
+                gameButton[1][0].getText().equals("O") && gameButton[1][1].getText().equals("O") && gameButton[1][2].getText().equals("O") ||
+                gameButton[2][0].getText().equals("O") && gameButton[2][1].getText().equals("O") && gameButton[2][2].getText().equals("O") ||
+                // horizontal line
+                gameButton[0][0].getText().equals("O") && gameButton[1][0].getText().equals("O") && gameButton[2][0].getText().equals("O") ||
+                gameButton[0][1].getText().equals("O") && gameButton[1][1].getText().equals("O") && gameButton[2][1].getText().equals("O") ||
+                gameButton[0][2].getText().equals("O") && gameButton[1][2].getText().equals("O") && gameButton[2][2].getText().equals("O") ||
+                // diagonal line
+                gameButton[0][0].getText().equals("O") && gameButton[1][1].getText().equals("O") && gameButton[2][2].getText().equals("O") ||
+                gameButton[0][2].getText().equals("O") && gameButton[1][1].getText().equals("O") && gameButton[2][0].getText().equals("O");
+    }
+
+    // EFFECTS: returns true if the grid is completely filled, otherwise false
+    public boolean isGridComplete() {
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                if (gameButton[x][y].getText().equals(" ")) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // EFFECTS: initializes the single-player frame
