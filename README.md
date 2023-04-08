@@ -6,10 +6,3 @@
 3 by 3 grid, with the objective of the markings creating a line (either diagonal, horizontal, or vertical). 
 
 Includes both a terminal version, and a GUI version made using Swing.
-
-**Additions To Add:**
-
-- More advanced AI bot and alpha-beta pruning
-
-
-    
