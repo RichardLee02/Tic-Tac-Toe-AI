@@ -1,7 +1,6 @@
 package ui;
 
 import model.Configuration;
-
 import java.util.Scanner;
 
 public class Game {
